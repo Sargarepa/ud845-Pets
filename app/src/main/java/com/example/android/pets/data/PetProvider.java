@@ -1,15 +1,31 @@
 package com.example.android.pets.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.pets.data.PetContract.PetEntry;
+
 public class PetProvider extends ContentProvider {
 
+    private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
     private PetDbHelper mDbHelper;
+
+    private static final int PETS = 100;
+    private static final int PET_ID = 101;
+
+    static {
+        sUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS, PETS);
+        sUriMatcher.addURI(PetContract.CONTENT_AUTHORITY, PetContract.PATH_PETS + "/#", PET_ID);
+    }
 
     @Override
     public boolean onCreate() {
@@ -20,7 +36,24 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, @Nullable String[] strings, @Nullable String s, @Nullable String[] strings1, @Nullable String s1) {
-        return null;
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        Cursor cursor;
+
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                cursor = db.query(PetEntry.TABLE_NAME, strings, s, strings1, null, null, s1);
+                break;
+            case PET_ID:
+                s = PetEntry._ID + "?=";
+                strings1 = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                cursor = db.query(PetEntry.TABLE_NAME, strings, s, strings1, null, null, s1);
+                break;
+            default:
+                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+        }
+
+        return cursor;
     }
 
     @Nullable

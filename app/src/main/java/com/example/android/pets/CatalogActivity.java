@@ -131,7 +131,7 @@ public class CatalogActivity extends AppCompatActivity {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
             // pets table in the database).
 
-            displayView.setText("The pets table contains " + cursor.getCount() + " pets");
+            displayView.setText("The pets table contains " + cursor.getCount() + " pets \n");
             displayView.append(PetEntry._ID + " - " +
                             PetEntry.COLUMN_PET_NAME + " - " +
                             PetEntry.COLUMN_PET_BREED + " - " +
