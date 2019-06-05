@@ -1,6 +1,7 @@
 package com.example.android.pets.data;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -17,6 +18,14 @@ import com.example.android.pets.data.PetContract.PetEntry;
 
 public class PetProvider extends ContentProvider {
     public static final String LOG_TAG = PetProvider.class.getSimpleName();
+
+    public static final String CONTENT_LIST_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" +
+                                                PetContract.CONTENT_AUTHORITY + "/" +
+                                                PetContract.PATH_PETS;
+
+    public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" +
+                                                PetContract.CONTENT_AUTHORITY + "/" +
+                                                PetContract.PATH_PETS;
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -62,7 +71,16 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+
+        switch(match) {
+            case PETS:
+                return CONTENT_LIST_TYPE;
+            case PET_ID:
+                return CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+        }
     }
 
     @Nullable
