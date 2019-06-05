@@ -42,7 +42,7 @@ public class PetProvider extends ContentProvider {
         SQLiteDatabase db = mDbHelper.getReadableDatabase();
         Cursor cursor;
 
-        int match = sUriMatcher.match(uri);
+        final int match = sUriMatcher.match(uri);
         switch (match) {
             case PETS:
                 cursor = db.query(PetEntry.TABLE_NAME, strings, s, strings1, null, null, s1);
@@ -69,7 +69,7 @@ public class PetProvider extends ContentProvider {
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
 
-        int match = sUriMatcher.match(uri);
+        final int match = sUriMatcher.match(uri);
         switch (match) {
             case PETS:
                 return insertPet(uri, contentValues);
@@ -108,11 +108,67 @@ public class PetProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                return delete(uri, s, strings);
+            case PET_ID:
+                s = PetEntry._ID + "?=";
+                strings = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return delete(uri, s, strings);
+            default:
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_delete_not_supported));
+        }
     }
 
     @Override
     public int update(@NonNull Uri uri, @Nullable ContentValues contentValues, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                return updatePet(uri, contentValues, s, strings);
+            case PET_ID:
+                s = PetEntry._ID + "?=";
+                strings = new String[] {String.valueOf(ContentUris.parseId(uri))};
+                return updatePet(uri, contentValues, s, strings);
+            default:
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_update_not_supported) + uri);
+        }
+    }
+
+    private int updatePet(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+
+
+        if (contentValues.containsKey(PetEntry.COLUMN_PET_NAME)) {
+            String name = contentValues.getAsString(PetEntry.COLUMN_PET_NAME);
+            if (name == null) {
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_no_pet_name));
+            }
+        }
+
+        if (contentValues.containsKey(PetEntry.COLUMN_PET_GENDER)) {
+            Integer gender = contentValues.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+            if (gender == null || !PetContract.isValidGender(gender)) {
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_invalid_gender));
+            }
+        }
+
+        if (contentValues.containsKey(PetEntry.COLUMN_PET_WEIGHT)) {
+            Integer weight = contentValues.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+            if (weight != null && weight <= 0) {
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_invalid_weight));
+            }
+        }
+
+        if (contentValues.size() == 0) {
+            return 0;
+        }
+
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        return db.update(PetEntry.TABLE_NAME, contentValues, selection, selectionArgs);
     }
 }
