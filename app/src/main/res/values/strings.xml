@@ -60,6 +60,9 @@
     <string name="gender_female">Female</string>
 
     <string name="err_unknown_query">Cannot query unknown uri: </string>
+    <string name="err_no_pet_name">Pet requires a name</string>
+    <string name="err_invalid_gender">Pet requires a valid gender</string>
+    <string name="err_invalid_weight">Pet requires valid weight</string>
     <string name="editor_insert_pet_successful">Pet saved</string>
     <string name="editor_insert_pet_failed">Error while saving pet</string>
 </resources>

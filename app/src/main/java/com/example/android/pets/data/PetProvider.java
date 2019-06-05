@@ -10,11 +10,13 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.android.pets.R;
 import com.example.android.pets.data.PetContract.PetEntry;
 
 public class PetProvider extends ContentProvider {
+    public static final String LOG_TAG = PetProvider.class.getSimpleName();
 
     private static final UriMatcher sUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
@@ -72,14 +74,34 @@ public class PetProvider extends ContentProvider {
             case PETS:
                 return insertPet(uri, contentValues);
             default:
-                throw new IllegalArgumentException(R.string.err_unknown_query + String.valueOf(uri));
+                throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_unknown_query) + uri);
         }
     }
 
     private Uri insertPet(Uri uri, ContentValues contentValues) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
+        String name = contentValues.getAsString(PetEntry.COLUMN_PET_NAME);
+        if (name == null) {
+            throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_no_pet_name));
+        }
+
+        Integer gender = contentValues.getAsInteger(PetEntry.COLUMN_PET_GENDER);
+        if (gender == null || !PetContract.isValidGender(gender)) {
+            throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_invalid_gender));
+        }
+
+        Integer weight = contentValues.getAsInteger(PetEntry.COLUMN_PET_WEIGHT);
+        if (weight != null && weight <= 0) {
+            throw new IllegalArgumentException(getContext().getResources().getString(R.string.err_invalid_weight));
+        }
+
         long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
+
+        if (newRowId == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
 
         return ContentUris.withAppendedId(uri, newRowId);
     }
