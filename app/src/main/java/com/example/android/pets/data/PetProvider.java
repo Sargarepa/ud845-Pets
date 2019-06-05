@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.example.android.pets.R;
 import com.example.android.pets.data.PetContract.PetEntry;
 
 public class PetProvider extends ContentProvider {
@@ -50,7 +51,7 @@ public class PetProvider extends ContentProvider {
                 cursor = db.query(PetEntry.TABLE_NAME, strings, s, strings1, null, null, s1);
                 break;
             default:
-                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+                throw new IllegalArgumentException(R.string.err_unknown_query + String.valueOf(uri));
         }
 
         return cursor;
@@ -65,7 +66,22 @@ public class PetProvider extends ContentProvider {
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, @Nullable ContentValues contentValues) {
-        return null;
+
+        int match = sUriMatcher.match(uri);
+        switch (match) {
+            case PETS:
+                return insertPet(uri, contentValues);
+            default:
+                throw new IllegalArgumentException(R.string.err_unknown_query + String.valueOf(uri));
+        }
+    }
+
+    private Uri insertPet(Uri uri, ContentValues contentValues) {
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+
+        long newRowId = db.insert(PetEntry.TABLE_NAME, null, contentValues);
+
+        return ContentUris.withAppendedId(uri, newRowId);
     }
 
     @Override
