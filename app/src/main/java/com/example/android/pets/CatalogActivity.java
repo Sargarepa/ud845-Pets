@@ -106,7 +106,7 @@ public class CatalogActivity extends AppCompatActivity {
 
 
         // Create and/or open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+        //SQLiteDatabase db = mDbHelper.getReadableDatabase();
 
         String[] projection = {PetEntry._ID,
                 PetEntry.COLUMN_PET_NAME,
@@ -116,16 +116,18 @@ public class CatalogActivity extends AppCompatActivity {
 
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = db.query(PetEntry.TABLE_NAME,
+        /*Cursor cursor = db.query(PetEntry.TABLE_NAME,
                 projection,
                 null,
                 null,
                 null,
                 null,
                 null,
-                null);
+                null);*/
 
         TextView displayView = (TextView) findViewById(R.id.text_view_pet);
+
+        Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
