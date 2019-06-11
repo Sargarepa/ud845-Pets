@@ -18,7 +18,6 @@ package com.example.android.pets;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +25,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.android.pets.data.PetContract.PetEntry;
 
@@ -34,6 +32,8 @@ import com.example.android.pets.data.PetContract.PetEntry;
  * Displays list of pets that were entered and stored in the app.
  */
 public class CatalogActivity extends AppCompatActivity {
+
+    private ListView mDisplayView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +50,9 @@ public class CatalogActivity extends AppCompatActivity {
             }
         });
 
-
-        displayDatabaseInfo();
+        mDisplayView = (ListView) findViewById(R.id.list_view_pet);
+        View emptyView = findViewById(R.id.empty_view);
+        mDisplayView.setEmptyView(emptyView);
     }
 
     @Override
@@ -109,14 +110,15 @@ public class CatalogActivity extends AppCompatActivity {
                 PetEntry.COLUMN_PET_BREED,
                 PetEntry.COLUMN_PET_GENDER,
                 PetEntry.COLUMN_PET_WEIGHT};
-        
+
 
         ListView displayView = (ListView) findViewById(R.id.list_view_pet);
+
 
         Cursor cursor = getContentResolver().query(PetEntry.CONTENT_URI, projection, null, null, null);
 
         PetCursorAdapter petCursorAdapter = new PetCursorAdapter(this, cursor);
 
-        displayView.setAdapter(petCursorAdapter);
+        mDisplayView.setAdapter(petCursorAdapter);
     }
 }
