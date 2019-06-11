@@ -60,7 +60,7 @@ public class PetProvider extends ContentProvider {
                 s = PetEntry._ID + "?=";
                 strings1 = new String[] {String.valueOf(ContentUris.parseId(uri))};
                 cursor = db.query(PetEntry.TABLE_NAME, strings, s, strings1, null, null, s1);
-                break;
+            break;
             default:
                 throw new IllegalArgumentException(R.string.err_unknown_query + String.valueOf(uri));
         }
