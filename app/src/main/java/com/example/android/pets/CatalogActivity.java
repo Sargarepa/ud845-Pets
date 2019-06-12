@@ -102,6 +102,10 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
         getContentResolver().insert(PetEntry.CONTENT_URI, values);
     }
 
+    private void deleteAllPets() {
+        getContentResolver().delete(PetEntry.CONTENT_URI, null, null);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -112,7 +116,7 @@ public class CatalogActivity extends AppCompatActivity implements LoaderManager.
                 return true;
             // Respond to a click on the "Delete all entries" menu option
             case R.id.action_delete_all_entries:
-                // Do nothing for now
+                deleteAllPets();
                 return true;
         }
         return super.onOptionsItemSelected(item);

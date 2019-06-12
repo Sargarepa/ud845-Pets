@@ -91,6 +91,8 @@
     <!-- Dialog button text for the option to cancel deletion of the current pet [CHAR LIMIT=20] -->
     <string name="cancel">Cancel</string>
 
+    <string name="unknown_breed">Unknown breed</string>
+
     <string name="err_unknown_query">Cannot query unknown uri </string>
     <string name="err_no_pet_name">Pet requires a name</string>
     <string name="err_invalid_gender">Pet requires a valid gender</string>

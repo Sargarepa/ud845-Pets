@@ -120,6 +120,7 @@ public class PetProvider extends ContentProvider {
         return ContentUris.withAppendedId(uri, newRowId);
     }
 
+
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
