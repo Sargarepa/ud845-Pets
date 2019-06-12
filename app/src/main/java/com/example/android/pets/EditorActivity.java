@@ -21,7 +21,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -38,7 +37,6 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.android.pets.data.PetContract.PetEntry;
-import com.example.android.pets.data.PetDbHelper;
 
 /**
  * Allows user to create a new pet or edit an existing one.
@@ -131,7 +129,7 @@ public class EditorActivity extends AppCompatActivity implements
         });
     }
 
-    private void insertPet() {
+    private void savePet() {
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         String weightString = mWeightEditText.getText().toString().trim();
@@ -145,12 +143,22 @@ public class EditorActivity extends AppCompatActivity implements
         values.put(PetEntry.COLUMN_PET_GENDER, mGender);
         values.put(PetEntry.COLUMN_PET_WEIGHT, weight);
 
-        Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
 
-        if (newUri != null) {
-            Toast.makeText(this, R.string.editor_insert_pet_successful, Toast.LENGTH_SHORT).show();
+        if (mCurrentPetUri != null) {
+            int updatedRow = getContentResolver().update(mCurrentPetUri, values, null, null);
+            if (updatedRow != -1) {
+                Toast.makeText(this, R.string.editor_edit_pet_successful, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.editor_edit_pet_failed, Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, R.string.editor_insert_pet_failed, Toast.LENGTH_SHORT).show();
+            Uri newUri = getContentResolver().insert(PetEntry.CONTENT_URI, values);
+
+            if (newUri != null) {
+                Toast.makeText(this, R.string.editor_insert_pet_successful, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.editor_insert_pet_failed, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -168,7 +176,7 @@ public class EditorActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                insertPet();
+                savePet();
                 finish();
                 return true;
             // Respond to a click on the "Delete" menu option
