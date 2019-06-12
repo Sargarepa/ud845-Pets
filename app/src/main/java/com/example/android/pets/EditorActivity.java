@@ -133,9 +133,19 @@ public class EditorActivity extends AppCompatActivity implements
         String nameString = mNameEditText.getText().toString().trim();
         String breedString = mBreedEditText.getText().toString().trim();
         String weightString = mWeightEditText.getText().toString().trim();
-        int weight = Integer.parseInt(weightString);
+        int weight = 0;
 
+        if (mCurrentPetUri == null &&
+                TextUtils.isEmpty(nameString) &&
+                TextUtils.isEmpty(breedString) &&
+                TextUtils.isEmpty(weightString) &&
+                mGender == PetEntry.PET_GENDER_UNKNOWN) {
+            return;
+        }
 
+        if (!TextUtils.isEmpty(weightString)) {
+            weight = Integer.parseInt(weightString);
+        }
 
         ContentValues values = new ContentValues();
         values.put(PetEntry.COLUMN_PET_NAME, nameString);
